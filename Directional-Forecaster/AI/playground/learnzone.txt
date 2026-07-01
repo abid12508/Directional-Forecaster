@@ -1,0 +1,21 @@
+This is where we learn how to write LSTM models! :)
+
+create sample datasets
+input: [1, 2, 3] -> output: 4
+input: [2, 3, 4] -> output: 5
+
+batch first notes
+-----------------
+
+Batch first means:
+The first number in your data shape is the number of samples (batch size).
+
+For example, if you have 4 samples, each with 3 time steps, and 1 feature per step:
+
+With batch first, your data shape is:
+(4, 3, 1) — batch size first.
+
+Without batch first (default), your data shape is:
+(3, 4, 1) — time steps first.
+
+It just changes how you organize your data so the model can read it correctly.
