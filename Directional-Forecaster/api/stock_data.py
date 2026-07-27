@@ -1,5 +1,4 @@
 import yfinance as yf
-import UI.app as app
 
 class Stock:
     def __init__(self, ticker: str):
