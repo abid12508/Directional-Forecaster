@@ -1,6 +1,28 @@
-yfinance
+Standard Python libs:
+Math
+OS
+datetime
+tkinter
+
+Data processing:
+numpy
 pandas
-ta
+
+NN libs:
 torch
+    nn
+    optim
+    utils.data
+    TensorDataset
+    DataLoader
+
 scikit-learn
-matplotlib
+    preprocessing.StandardScaler
+scikit-optimize (skopt)
+    gp_minimize
+    Integer
+    Real
+
+Finance data:
+yfinance
+

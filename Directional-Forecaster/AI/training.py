@@ -198,20 +198,3 @@ def run_bayesian_optimization(closing_price, selected_features):
 
     return result
 
-def run_final_optimized_model(closing_price, selected_features, best_params):
-
-    volatility_window = int(best_params[0])
-    rsi_window = int(best_params[1])
-    learning_rate = float(best_params[2])
-    hidden_size = int(best_params[3])
-    layers = int(best_params[4])
-
-    validation_loss = run_training(closing_price=closing_price,
-                 selected_features=selected_features,
-                 volatility_window=volatility_window,
-                 rsi_window=rsi_window,
-                 learning_rate=learning_rate,
-                 hidden_size=hidden_size,
-                 layers=layers)
-
-    return validation_loss

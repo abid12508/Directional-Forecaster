@@ -130,8 +130,6 @@ class Directional_Forecaster:
 
         self.selected_features = self.get_selected_features()
 
-        print(self.selected_features)
-
         pop = sd.Stock(self.sb_sv.get())
 
         api_info = pop.getInfo().history(
@@ -155,26 +153,6 @@ class Directional_Forecaster:
                                                              best_params=training_result.x)
 
         print(f"Final training step and test validation loss: {test_result}")
-
-
-
-        
-
-        # -------------------------------- make popup window ---------------------------------
-        app_Popup = tk.Toplevel()
-        app_Popup.geometry("900x600")
-        app_Popup.title(f"{self.sb_sv.get()} stock properties from {self.date_value_list[0]} to {self.date_value_list[-1]} at {self.ti_iv.get()} intervals")
-
-        #Dataframe
-        df_Text = tk.Text(app_Popup, wrap="none")  # wrap="none" for horizontal scrolling
-        df_Text.insert("1.0", api_info.to_string())
-        df_Text.configure(state="disabled")  # make it read-only
-        df_Text.pack(side="left", fill="both", expand=True)
-
-        # Scrollbars
-        scroll_y = tk.Scrollbar(app_Popup, orient="vertical", command=df_Text.yview)
-        scroll_y.pack(side="right", fill="y")
-        df_Text.configure(yscrollcommand=scroll_y.set)
 
 
 
