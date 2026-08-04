@@ -64,8 +64,6 @@ def x_tensor_preprocess(feature_list):
 
     scaler = StandardScaler()
 
-    print(f"training_set: {training_set}\n validation_set: {validation_set}\n testing_set:{testing_set}")
-
     train_scaled = scaler.fit_transform(training_set.numpy())
 
     val_scaled = scaler.transform(validation_set.numpy())
@@ -86,7 +84,7 @@ def x_tensor_preprocess(feature_list):
         dtype=torch.float32
     )
 
-    return x_train_tensor, x_val_tensor, x_test_tensor, training_split, validation_split
+    return x_train_tensor, x_val_tensor, x_test_tensor, training_split, validation_split, scaler
 
 
 def y_tensor_preprocess(closing_price, valid_rows, training_split, validation_split):
@@ -144,7 +142,7 @@ def tensor_dataset(closing_price, selected_features, windows):
 
     feature_list, valid_rows = feature_select(closing_price, selected_features, windows)
 
-    X_train_tensor, X_val_tensor, X_test_tensor, training_split, validation_split = x_tensor_preprocess(feature_list)
+    X_train_tensor, X_val_tensor, X_test_tensor, training_split, validation_split, scaler = x_tensor_preprocess(feature_list)
     y_train_tensor, y_val_tensor, y_test_tensor = y_tensor_preprocess(closing_price, valid_rows, training_split, validation_split)
 
     X_train, y_train = create_sequences(
@@ -165,4 +163,23 @@ def tensor_dataset(closing_price, selected_features, windows):
         SEQUENCE_LEN
     )
 
-    return X_train, y_train, X_val, y_val, X_test, y_test
+    return X_train, y_train, X_val, y_val, X_test, y_test, scaler
+
+
+def build_next_step_input(closing_price, selected_features, windows, scaler, sequence_length=SEQUENCE_LEN):
+
+    feature_list, _ = feature_select(closing_price, selected_features, windows)
+
+    if len(feature_list) < sequence_length:
+        raise ValueError(
+            f"Need at least {sequence_length} valid feature rows to build a "
+            f"sequence, but only {len(feature_list)} are available."
+        )
+
+    latest_rows = feature_list[-sequence_length:]
+
+    scaled = scaler.transform(latest_rows.numpy())
+
+    next_step_input = torch.tensor(scaled, dtype=torch.float32).unsqueeze(0)  # [1, seq_len, n_features]
+
+    return next_step_input

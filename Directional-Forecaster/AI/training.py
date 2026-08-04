@@ -9,14 +9,14 @@ from skopt.space import Integer, Real
 from . import model
 from . import preprocessing as pp
 
-EPOCHS = 100
+EPOCHS = 200
 BATCH_SIZE = 32
 
 search_space = [
     Integer(5, 20, name="volatility_window"),
     Integer(5, 20, name="rsi_window"),
     Real(1e-4, 1e-2, prior="log-uniform", name="learning_rate"),
-    Integer(16, 128, name="hidden_size"),
+    Integer(32, 256, name="hidden_size"),
     Integer(1, 3, name="layers")
 ]
 
@@ -99,7 +99,7 @@ def run_training(closing_price, selected_features, volatility_window,
         "rsi": rsi_window
     }
 
-    X_train, y_train, X_val, y_val, X_test, y_test = obtain_data(
+    X_train, y_train, X_val, y_val, X_test, y_test, scaler = obtain_data(
         closing_price,
         selected_features, 
         windows
@@ -191,10 +191,9 @@ def run_bayesian_optimization(closing_price, selected_features):
             params, closing_price, selected_features
         ),
         dimensions=search_space,
-        n_calls=5,
-        n_initial_points=5,
+        n_calls=10,
+        n_initial_points=10,
         random_state=42
     )
 
     return result
-

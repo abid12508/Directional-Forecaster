@@ -3,11 +3,12 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
 from . import model
+from . import preprocessing as pp
 from . import training as tr
 
-def test_model(model, test_loader, criterion, device):
+def test_model(model_instance, test_loader, criterion, device):
 
-    model.eval()
+    model_instance.eval()
 
     total_loss = 0.0
 
@@ -18,7 +19,7 @@ def test_model(model, test_loader, criterion, device):
             batch_X = batch_X.to(device)
             batch_y = batch_y.to(device)
 
-            output = model(batch_X)
+            output = model_instance(batch_X)
 
             loss = criterion(output, batch_y)
 
@@ -31,6 +32,24 @@ def test_model(model, test_loader, criterion, device):
     )
 
     return average_loss
+
+
+def predict_next_step(model_instance, closing_price, selected_features, windows, scaler, device):
+
+    next_step_input = pp.build_next_step_input(
+        closing_price, selected_features, windows, scaler
+    )
+
+    model_instance.eval()
+
+    with torch.no_grad():
+        logits = model_instance(next_step_input.to(device))
+        probabilities = torch.softmax(logits, dim=1)
+
+    prediction = torch.argmax(probabilities, dim=1).item()
+    confidence = probabilities[0, prediction].item()
+
+    return prediction, confidence
 
 def run_testing(closing_price, selected_features, best_params):
 
@@ -45,7 +64,7 @@ def run_testing(closing_price, selected_features, best_params):
         "rsi": rsi_window
     }
 
-    X_train, y_train, X_val, y_val, X_test, y_test = tr.obtain_data(
+    X_train, y_train, X_val, y_val, X_test, y_test, scaler = tr.obtain_data(
         closing_price,
         selected_features,
         windows
@@ -93,10 +112,21 @@ def run_testing(closing_price, selected_features, best_params):
 
     # Test final trained model
     test_loss = test_model(
-        model=model_instance,
+        model_instance=model_instance,
         test_loader=test_loader,
         criterion=criterion,
         device=device
     )
 
-    return test_loss
+    # Predict the next, not-yet-observed time step (uses full closing_price
+    # history and the scaler fit during this model's training)
+    prediction, confidence = predict_next_step(
+        model_instance=model_instance,
+        closing_price=closing_price,
+        selected_features=selected_features,
+        windows=windows,
+        scaler=scaler,
+        device=device
+    )
+
+    return test_loss, prediction, confidence

@@ -14,13 +14,9 @@ class StockLSTM(nn.Module):
 
         self.linear = nn.Linear(hidden_size, 2)
 
-        self.softmax = nn.Softmax(dim=1)
-        
     def forward(self, x):
         model_output, (hidden, cell) = self.lstm(x)
         last_output = model_output[:, -1, :]
         logits = self.linear(last_output)
-        probabilities = self.softmax(logits)
 
-        return probabilities
-        
+        return logits

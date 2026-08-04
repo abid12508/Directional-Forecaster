@@ -137,6 +137,9 @@ class Directional_Forecaster:
             interval=self.ti_iv.get()
         )
 
+        last_time = api_info.index[-1]
+        next_time = last_time + pd.Timedelta(minutes=int(self.ti_iv.get()[:-1]))
+
         self.close_value_list = api_info["Close"].tolist()
         self.date_value_list = pd.to_datetime(api_info.index).strftime("%m/%d/%y %H:%M").tolist()
         
@@ -148,11 +151,12 @@ class Directional_Forecaster:
         print(f"best params: {training_result.x}, best validation loss: {training_result.fun}")
         print("Running final training step and testing...")
 
-        test_result = ts.run_testing(closing_price=self.close_value_list, 
+        test_result, prediction, confidence = ts.run_testing(closing_price=self.close_value_list, 
                                                              selected_features=self.selected_features,
                                                              best_params=training_result.x)
 
         print(f"Final training step and test validation loss: {test_result}")
+        print(f" Predicted {next_time} step direction: {prediction} with {confidence:.2%}% confidence")
 
 
 
