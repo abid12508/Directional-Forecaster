@@ -1,28 +1,8 @@
-Standard Python libs:
-Math
-OS
-datetime
-tkinter
+# Install with: pip install -r requirements.txt
 
-Data processing:
 numpy
 pandas
-
-NN libs:
 torch
-    nn
-    optim
-    utils.data
-    TensorDataset
-    DataLoader
-
 scikit-learn
-    preprocessing.StandardScaler
-scikit-optimize (skopt)
-    gp_minimize
-    Integer
-    Real
-
-Finance data:
+scikit-optimize
 yfinance
-
